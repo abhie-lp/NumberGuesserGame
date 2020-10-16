@@ -8,10 +8,12 @@ const http_1 = __importDefault(require("http"));
 const path_1 = __importDefault(require("path"));
 const socket_io_1 = __importDefault(require("socket.io"));
 const gameEngine_1 = __importDefault(require("./gameEngine"));
+const player_1 = __importDefault(require("./player"));
 const PORT = 3000;
 class App {
     constructor(port) {
         this.port = port;
+        this.players = {};
         const app = express_1.default();
         app.use(express_1.default.static(path_1.default.join(__dirname, "../client")));
         app.use("/jquery", express_1.default.static(path_1.default.join(__dirname, "../../node_modules/jquery/dist")));
@@ -21,9 +23,22 @@ class App {
         this.game = new gameEngine_1.default();
         this.io.on("connection", (socket) => {
             console.log("User Connected: ", socket.id);
-            socket.on("disconnect", () => console.log("User disconnected", socket.id));
+            socket.on("disconnect", () => {
+                console.log("User disconnected", socket.id);
+                // Delete the player detail with current socket ID if present
+                if (this.players && this.players[socket.id]) {
+                    delete this.players[socket.id];
+                }
+            });
             // Send the chat message to everyone else connected.
             socket.on("chatMessage", (chatMessage) => socket.broadcast.emit("chatMessage", chatMessage));
+            socket.on("screenName", (enteredName) => {
+                let screenName = enteredName;
+                // Create a new player with the given socket ID
+                this.players[socket.id] = new player_1.default(screenName);
+                // Send the new player details to the client.
+                socket.emit("playerDetails", this.players[socket.id].player);
+            });
         });
     }
     Start() {

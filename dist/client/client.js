@@ -7,15 +7,15 @@ var Client = /** @class */ (function () {
             if (enteredName.length > 0) {
                 $("#modal").modal("hide");
                 var _a = enteredName.split(" "), firstName = _a[0], lastName = _a[1];
-                _this.screenName = {
+                var screenName = {
                     name: enteredName,
                     abbreviation: lastName ?
                         firstName[0].toUpperCase() + lastName[0].toUpperCase() :
                         firstName.slice(0, 2).toUpperCase()
                 };
-                $(".screenName").text(_this.screenName.name);
+                // Send the screen name to the server to create player details.
+                _this.socket.emit("screenName", screenName);
             }
-            console.log(_this.screenName);
         };
         this.scrollChatWindow = function () {
             $("#messages").animate({
@@ -49,6 +49,11 @@ var Client = /** @class */ (function () {
                 '</li>');
             _this.scrollChatWindow();
         });
+        this.socket.on("playerDetails", function (player) {
+            _this.player = player;
+            $(".screenName").text(player.screenName.name);
+            $(".score").text(player.score);
+        });
         $(document).ready(function () {
             $("#messageText").keypress(function (e) {
                 var key = e.which;
@@ -69,11 +74,11 @@ var Client = /** @class */ (function () {
     Client.prototype.sendMessage = function () {
         var messageText = $("#messageText").val();
         if (messageText.toString().length > 0) {
-            this.socket.emit("chatMessage", { message: messageText, from: this.screenName.abbreviation });
+            this.socket.emit("chatMessage", { message: messageText, from: this.player.screenName.abbreviation });
             $("#messages").append('<li>' +
                 '<span class="float-left">' +
                 '<span class="circle">' +
-                this.screenName.abbreviation +
+                this.player.screenName.abbreviation +
                 '</span>' +
                 '</span>' +
                 '<div class="myMessage">' +

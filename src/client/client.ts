@@ -8,14 +8,19 @@ type ScreenName = {
   abbreviation: string
 }
 
+type Player = {
+  score: number,
+  screenName: ScreenName
+}
+
 
 class Client {
   private socket: SocketIOClient.Socket;
-  private screenName: ScreenName;
+  private player: Player;
 
   constructor() {
     this.socket = io();
-
+    
     this.socket.on("connect", () => console.log("Connected"));
     this.socket.on("disconnect", (message: any) => {
       console.log("Disconnected", message);
@@ -43,6 +48,12 @@ class Client {
       }
     );
 
+    this.socket.on("playerDetails", (player: Player) => {
+      this.player = player;
+      $(".screenName").text(player.screenName.name);
+      $(".score").text(player.score);
+    })
+
     $(document).ready(() => {
       $("#messageText").keypress((e) => {
         let key = e.which;
@@ -68,16 +79,16 @@ class Client {
     if (enteredName.length > 0) {
       (<any>$("#modal")).modal("hide");
       const [firstName, lastName] = enteredName.split(" ");
-      this.screenName = {
+      let screenName: ScreenName = {
         name: enteredName,
         abbreviation: lastName ? 
                       firstName[0].toUpperCase() + lastName[0].toUpperCase() :
                       firstName.slice(0, 2).toUpperCase()
       }
-      $(".screenName").text(this.screenName.name);
+      
+      // Send the screen name to the server to create player details.
+      this.socket.emit("screenName", screenName);
     }
-
-    console.log(this.screenName)
   }
 
   private scrollChatWindow = () => {
@@ -98,13 +109,13 @@ class Client {
     if (messageText.toString().length > 0) {
       this.socket.emit(
         "chatMessage",
-        <ChatMessage>{message: messageText, from: this.screenName.abbreviation}
+        <ChatMessage>{message: messageText, from: this.player.screenName.abbreviation}
       );
       $("#messages").append(
         '<li>' + 
           '<span class="float-left">' +
             '<span class="circle">' +
-              this.screenName.abbreviation +
+              this.player.screenName.abbreviation +
             '</span>' +
           '</span>' +
           '<div class="myMessage">' +
