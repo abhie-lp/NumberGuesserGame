@@ -22,6 +22,8 @@ class App {
         this.io.on("connection", (socket) => {
             console.log("User Connected: ", socket.id);
             socket.on("disconnect", () => console.log("User disconnected", socket.id));
+            // Send the chat message to everyone else connected.
+            socket.on("chatMessage", (chatMessage) => socket.broadcast.emit("chatMessage", chatMessage));
         });
     }
     Start() {

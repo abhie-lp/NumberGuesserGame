@@ -33,6 +33,12 @@ class App {
       console.log("User Connected: ", socket.id);
 
       socket.on("disconnect", () => console.log("User disconnected", socket.id));
+
+      // Send the chat message to everyone else connected.
+      socket.on(
+        "chatMessage",
+        (chatMessage: ChatMessage) => socket.broadcast.emit("chatMessage", chatMessage)
+      );
     });
   }
 
