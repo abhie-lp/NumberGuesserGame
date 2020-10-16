@@ -50,7 +50,7 @@ class Client {
 
   private scrollChatWindow = () => {
     $("#messages").animate({
-      scrollTop: $("#messages li:last-child").position().top;
+      scrollTop: $("#messages").prop("scrollHeight")
     }, 200);
 
     setTimeout(() => {

@@ -3,7 +3,7 @@ var Client = /** @class */ (function () {
         var _this = this;
         this.scrollChatWindow = function () {
             $("#messages").animate({
-                scrollTop: $("#messages li:last-child").position().top
+                scrollTop: $("#messages").prop("scrollHeight")
             }, 200);
             setTimeout(function () {
                 var messagesLength = $("#messages li");
