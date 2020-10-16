@@ -54,6 +54,27 @@ var Client = /** @class */ (function () {
             $(".screenName").text(player.screenName.name);
             $(".score").text(player.score);
         });
+        this.socket.on("GameStates", function (gameStates) {
+            gameStates.forEach(function (gameState) {
+                var gid = gameState.id;
+                if (gameState.gameClock >= 0) {
+                    if (gameState.gameClock >= gameState.duration) {
+                        $("#gamephase" + gid).text("New game. Time to check your luck.");
+                    }
+                    $("#timer" + gid).css("display", "block");
+                    $("#timer" + gid).text(gameState.gameClock.toString());
+                    var progressParent = (gameState.gameClock / gameState.duration) * 100;
+                    $("#timerBar" + gid).css("background-color", "#4caf50");
+                    $("#timerBar" + gid).css("width", progressParent + "%");
+                }
+                else {
+                    $("#timerBar" + gid).css("background-color", "#ff0000");
+                    $("#timerBar" + gid).css("width", "100%");
+                    $("#timer" + gid).css("display", "none");
+                    $("#gamePhase" + gid).text("Game Closed.");
+                }
+            });
+        });
         $(document).ready(function () {
             $("#messageText").keypress(function (e) {
                 var key = e.which;

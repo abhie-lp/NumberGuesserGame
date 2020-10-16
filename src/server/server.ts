@@ -13,7 +13,7 @@ const PORT: number = 3000;
 class App {
   private server: http.Server;
   private io: socketIO.Server;
-  private game: GuessNumberGame;
+  private games: {[id: number]: GuessNumberGame} = {};
   private players: {[id: string]: Player} = {};
 
   constructor(private port: number) {
@@ -30,7 +30,9 @@ class App {
 
     this.server = new http.Server(app);
     this.io = socketIO(this.server);
-    this.game = new GuessNumberGame();
+    this.games[0] = new GuessNumberGame(0, "Bronze Game", "🥉", 10);
+    this.games[1] = new GuessNumberGame(1, "Silver Game", "🥈", 16);
+    this.games[2] = new GuessNumberGame(2, "Gold Game", "🥇", 35);
 
     this.io.on("connection", (socket: socketIO.Socket) => {
       console.log("User Connected: ", socket.id);
@@ -60,6 +62,13 @@ class App {
         socket.emit("playerDetails", this.players[socket.id].player);
       })
     });
+
+    setInterval(() => {
+      this.io.emit(
+        "GameStates",
+        [this.games[0].gameState, this.games[1].gameState, this.games[2].gameState]
+      )
+    }, 1000)
   }
 
   Start() {
