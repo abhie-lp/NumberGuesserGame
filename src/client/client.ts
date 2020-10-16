@@ -3,9 +3,15 @@ type ChatMessage = {
   from: string
 }
 
+type ScreenName = {
+  name: string,
+  abbreviation: string
+}
+
 
 class Client {
   private socket: SocketIOClient.Socket;
+  private screenName: ScreenName;
 
   constructor() {
     this.socket = io();
@@ -45,7 +51,33 @@ class Client {
           return false;
         }
       });
+
+      $("#screenNameInput").keypress((e) => {
+        let key = e.which;
+        if (key == 13) {
+          this.setScreenName();
+          return false;
+        }
+      });
     });
+  }
+
+  setScreenName = () => {
+    const enteredName: string = <string>$("#screenNameInput").val();
+    console.log("Screen Name", enteredName);
+    if (enteredName.length > 0) {
+      (<any>$("#modal")).modal("hide");
+      const [firstName, lastName] = enteredName.split(" ");
+      this.screenName = {
+        name: enteredName,
+        abbreviation: lastName ? 
+                      firstName[0].toUpperCase() + lastName[0].toUpperCase() :
+                      firstName.slice(0, 2).toUpperCase()
+      }
+      $(".screenName").text(this.screenName.name);
+    }
+
+    console.log(this.screenName)
   }
 
   private scrollChatWindow = () => {
@@ -66,13 +98,13 @@ class Client {
     if (messageText.toString().length > 0) {
       this.socket.emit(
         "chatMessage",
-        <ChatMessage>{message: messageText, from: "AB"}
+        <ChatMessage>{message: messageText, from: this.screenName.abbreviation}
       );
       $("#messages").append(
         '<li>' + 
           '<span class="float-left">' +
             '<span class="circle">' +
-              'AB' +
+              this.screenName.abbreviation +
             '</span>' +
           '</span>' +
           '<div class="myMessage">' +

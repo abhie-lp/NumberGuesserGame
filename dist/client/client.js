@@ -1,6 +1,22 @@
 var Client = /** @class */ (function () {
     function Client() {
         var _this = this;
+        this.setScreenName = function () {
+            var enteredName = $("#screenNameInput").val();
+            console.log("Screen Name", enteredName);
+            if (enteredName.length > 0) {
+                $("#modal").modal("hide");
+                var _a = enteredName.split(" "), firstName = _a[0], lastName = _a[1];
+                _this.screenName = {
+                    name: enteredName,
+                    abbreviation: lastName ?
+                        firstName[0].toUpperCase() + lastName[0].toUpperCase() :
+                        firstName.slice(0, 2).toUpperCase()
+                };
+                $(".screenName").text(_this.screenName.name);
+            }
+            console.log(_this.screenName);
+        };
         this.scrollChatWindow = function () {
             $("#messages").animate({
                 scrollTop: $("#messages").prop("scrollHeight")
@@ -41,16 +57,23 @@ var Client = /** @class */ (function () {
                     return false;
                 }
             });
+            $("#screenNameInput").keypress(function (e) {
+                var key = e.which;
+                if (key == 13) {
+                    _this.setScreenName();
+                    return false;
+                }
+            });
         });
     }
     Client.prototype.sendMessage = function () {
         var messageText = $("#messageText").val();
         if (messageText.toString().length > 0) {
-            this.socket.emit("chatMessage", { message: messageText, from: "AB" });
+            this.socket.emit("chatMessage", { message: messageText, from: this.screenName.abbreviation });
             $("#messages").append('<li>' +
                 '<span class="float-left">' +
                 '<span class="circle">' +
-                'AB' +
+                this.screenName.abbreviation +
                 '</span>' +
                 '</span>' +
                 '<div class="myMessage">' +
