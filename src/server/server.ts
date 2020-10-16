@@ -16,6 +16,14 @@ class App {
   constructor(private port: number) {
     const app = express();
     app.use(express.static(path.join(__dirname, "../client")));
+    app.use(
+      "/jquery",
+      express.static(path.join(__dirname, "../../node_modules/jquery/dist"))
+    );
+    app.use(
+      "/bootstrap",
+      express.static(path.join(__dirname, "../../node_modules/bootstrap/dist"))
+    );
 
     this.server = new http.Server(app);
     this.io = socketIO(this.server);
