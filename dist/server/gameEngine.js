@@ -4,6 +4,7 @@ class GuessNumberGame {
     constructor(id, title, logo, duration, updateChatCallback) {
         this._gamePhase = 0;
         this._gameClock = 0;
+        this._result = -1;
         this._id = id;
         this._title = title;
         this._logo = logo;
@@ -26,7 +27,13 @@ class GuessNumberGame {
                 }
             }
             else if (this._gamePhase === 2) {
-                if (this._gameClock <= -5) {
+                if (this._gameClock === -2) {
+                    this._result = (Math.floor(Math.random() * 10) + 1);
+                    this._updateChatCallback({ message: "Result: " + this._result,
+                        from: this._logo,
+                        type: "gameMessage" });
+                }
+                else if (this._gameClock <= -5) {
                     this._gamePhase = 0;
                 }
             }
@@ -36,7 +43,8 @@ class GuessNumberGame {
                 logo: this._logo,
                 duration: this._duration,
                 gameClock: this._gameClock,
-                gamePhase: this._gamePhase
+                gamePhase: this._gamePhase,
+                result: this._result
             };
             this._gameClock -= 1;
         }, 1000);

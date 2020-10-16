@@ -6,6 +6,7 @@ export default class GuessNumberGame {
   private _gamePhase: number = 0;
   private _gameClock: number = 0;
   private _gameState: GameState;
+  private _result: number = -1;
   private _updateChatCallback: (chatMessag: ChatMessage) => void;
 
   constructor(
@@ -36,7 +37,12 @@ export default class GuessNumberGame {
                                                  type: "gameMessage"})
         }
       } else if (this._gamePhase === 2) {
-        if (this._gameClock <= -5) {
+        if (this._gameClock === -2) {
+          this._result = (Math.floor(Math.random() * 10) + 1);
+          this._updateChatCallback(<ChatMessage>{message: "Result: " + this._result,
+                                                 from: this._logo,
+                                                 type: "gameMessage"});
+        } else if (this._gameClock <= -5) {
           this._gamePhase = 0;
         }
       }
@@ -46,7 +52,8 @@ export default class GuessNumberGame {
         logo: this._logo,
         duration: this._duration,
         gameClock: this._gameClock,
-        gamePhase: this._gamePhase
+        gamePhase: this._gamePhase,
+        result: this._result
       };
       this._gameClock -= 1;
     }, 1000)

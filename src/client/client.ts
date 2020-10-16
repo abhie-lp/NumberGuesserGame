@@ -20,7 +20,8 @@ type GameState = {
   logo: string,
   gamePhase: number,
   gameClock: number,
-  duration: number
+  duration: number,
+  result: number
 }
 
 
@@ -47,7 +48,7 @@ class Client {
         if (chatMessage.type == "gameMessage") {
           [floatDirection, messageClass] = ["left", "gameMessage"]
         }
-        
+
         $("#messages").append(
           "<li>" +
             `<span class='float-${floatDirection}'>` +
@@ -77,6 +78,11 @@ class Client {
           if (gameState.gameClock >= gameState.duration) {
             $("#gamephase" + gid).text("New game. Time to check your luck.");
           }
+
+          if (gameState.gameClock === gameState.duration - 5) {
+            (<any>$("#resultAlert" + gid)).alert().fadeOut(500);
+          }
+
           $("#timer" + gid).css("display", "block");
           $("#timer" + gid).text(gameState.gameClock.toString());
 
@@ -87,12 +93,25 @@ class Client {
           $("#timerBar" + gid).css("background-color", "#ff0000");
           $("#timerBar" + gid).css("width", "100%");
           $("#timer" + gid).css("display", "none");
-          $("#gamePhase" + gid).text("Game Closed.")
+          $("#gamePhase" + gid).text("Game Closed.");
+
+          if (gameState.gameClock === -2 && gameState.result !== -1) {
+            $("#resultValue" + gid).text(gameState.result);
+            $("#resultAlert" + gid).fadeIn(100);
+          }
         }
       })
     })
 
     $(document).ready(() => {
+
+      $("#resultValue0").addClass("spinnner");
+      $("#resultValue1").addClass("spinnner");
+      $("#resultValue2").addClass("spinnner");
+      (<any>$("#resultAlert0")).alert().hide();
+      (<any>$("#resultAlert1")).alert().hide();
+      (<any>$("#resultAlert2")).alert().hide();
+
       $("#messageText").keypress((e) => {
         let key = e.which;
         if (key == 13) {

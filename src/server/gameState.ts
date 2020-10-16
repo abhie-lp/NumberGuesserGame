@@ -4,5 +4,6 @@ type GameState = {
   logo: string,
   gamePhase: number,
   gameClock: number,
-  duration: number
+  duration: number,
+  result: number
 }

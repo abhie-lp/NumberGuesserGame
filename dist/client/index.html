@@ -141,6 +141,36 @@
         background: #1bffbb;
       }
 
+      .resultValue {
+        font-size: 3.5em;
+        width: 100%;
+        text-align: center;
+      }
+
+      @keyframes spinner {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .spinnner:before {
+        content: "";
+        box-sizing: border-box;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 90px;
+        height: 90px;
+        margin-top: -45px;
+        margin-left: -45px;
+        border-radius: 50%;
+        border: 10px solid #f6f;
+        border-top-color: #0e0;
+        border-right-color: #0dd;
+        border-bottom-color: #f90;
+        animation: spinner .6s linear infinite;
+      }
+
       .footer {
         margin-top: 50px;
       }
@@ -183,6 +213,15 @@
               <span class="screenName font-weight-bold"></span>, and your score is 
               <span class="score"></span>
             </div>
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="m-2">
+                  <div id="resultAlert0" class="alert alert-info" role="alert">
+                    <h1 class="alert-heading p-1 resultValue" id="resultValue0"></h1>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="gamePanel" id="gamePanel1">
@@ -197,6 +236,15 @@
               <span class="screenName font-weight-bold"></span>, and your score is 
               <span class="score"></span>
             </div>
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="m-2">
+                  <div id="resultAlert1" class="alert alert-info" role="alert">
+                    <h1 class="alert-heading p-1 resultValue" id="resultValue1"></h1>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="gamePanel" id="gamePanel2">
@@ -210,6 +258,16 @@
               Your Screen Name is 
               <span class="screenName font-weight-bold"></span>, and your score is 
               <span class="score"></span>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="m-2">
+                  <div id="resultAlert2" class="alert alert-info" role="alert">
+                    <h1 class="alert-heading p-1 resultValue" id="resultValue2"></h1>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
