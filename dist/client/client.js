@@ -37,13 +37,18 @@ var Client = /** @class */ (function () {
             }, 1000);
         });
         this.socket.on("chatMessage", function (chatMessage) {
+            var _a;
+            var _b = ["right", "otherMessage"], floatDirection = _b[0], messageClass = _b[1];
+            if (chatMessage.type == "gameMessage") {
+                _a = ["left", "gameMessage"], floatDirection = _a[0], messageClass = _a[1];
+            }
             $("#messages").append("<li>" +
-                "<span class='float-right'>" +
+                ("<span class='float-" + floatDirection + "'>") +
                 '<span class="circle">' +
                 chatMessage.from +
                 '</span>' +
                 '</span>' +
-                '<div class="otherMessage">' +
+                ("<div class=\"" + messageClass + "\">") +
                 chatMessage.message +
                 '</div>' +
                 '</li>');

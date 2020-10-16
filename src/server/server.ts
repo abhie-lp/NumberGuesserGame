@@ -30,9 +30,9 @@ class App {
 
     this.server = new http.Server(app);
     this.io = socketIO(this.server);
-    this.games[0] = new GuessNumberGame(0, "Bronze Game", "🥉", 10);
-    this.games[1] = new GuessNumberGame(1, "Silver Game", "🥈", 16);
-    this.games[2] = new GuessNumberGame(2, "Gold Game", "🥇", 35);
+    this.games[0] = new GuessNumberGame(0, "Bronze Game", "🥉", 10, this.updateChat);
+    this.games[1] = new GuessNumberGame(1, "Silver Game", "🥈", 16, this.updateChat);
+    this.games[2] = new GuessNumberGame(2, "Gold Game", "🥇", 35, this.updateChat);
 
     this.io.on("connection", (socket: socketIO.Socket) => {
       console.log("User Connected: ", socket.id);
@@ -70,6 +70,8 @@ class App {
       )
     }, 1000)
   }
+
+  updateChat = (chatMessage: ChatMessage) => this.io.emit("chatMessage", chatMessage);
 
   Start() {
     this.server.listen(this.port);

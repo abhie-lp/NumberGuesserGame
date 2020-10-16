@@ -1,6 +1,7 @@
 type ChatMessage = {
   message: string,
-  from: string
+  from: string,
+  type: "playerMessage" | "gameMessage"
 }
 
 type ScreenName = {
@@ -41,14 +42,20 @@ class Client {
     this.socket.on(
       "chatMessage",
       (chatMessage: ChatMessage) => {
+        let [floatDirection, messageClass] = ["right", "otherMessage"];
+
+        if (chatMessage.type == "gameMessage") {
+          [floatDirection, messageClass] = ["left", "gameMessage"]
+        }
+        
         $("#messages").append(
           "<li>" +
-            "<span class='float-right'>" +
+            `<span class='float-${floatDirection}'>` +
               '<span class="circle">' +
                   chatMessage.from +
               '</span>' +
             '</span>' +
-            '<div class="otherMessage">' +
+            `<div class="${messageClass}">` +
               chatMessage.message +
             '</div>' +
           '</li>'
