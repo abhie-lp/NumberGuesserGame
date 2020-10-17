@@ -30,13 +30,13 @@ class App {
     this.server = new http.Server(app);
     this.io = socketIO(this.server);
     this.games[0] = new GuessNumberGame(
-      0, "Bronze Game", "🥉", 10, 1, 10, this.players, this.updateChat, this.sendPlayerDetails
+      0, "Bronze Game", "🥉", 10, 1, 5, this.players, this.updateChat, this.sendPlayerDetails
     );
     this.games[1] = new GuessNumberGame(
-      1, "Silver Game", "🥈", 16, 3, 20, this.players, this.updateChat, this.sendPlayerDetails
+      1, "Silver Game", "🥈", 15, 3, 20, this.players, this.updateChat, this.sendPlayerDetails
     );
     this.games[2] = new GuessNumberGame(
-      2, "Gold Game", "🥇", 35, 5, 50, this.players, this.updateChat, this.sendPlayerDetails
+      2, "Gold Game", "🥇", 25, 5, 40, this.players, this.updateChat, this.sendPlayerDetails
     );
 
     this.io.on("connection", (socket: socketIO.Socket) => {
