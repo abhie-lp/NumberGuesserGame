@@ -42,18 +42,18 @@ var Client = /** @class */ (function () {
             }, 1000);
         });
         this.socket.on("chatMessage", function (chatMessage) {
-            var _a;
-            var _b = ["right", "otherMessage"], floatDirection = _b[0], messageClass = _b[1];
+            var messageClass = "otherMessage";
             if (chatMessage.type == "gameMessage") {
-                _a = ["left", "gameMessage"], floatDirection = _a[0], messageClass = _a[1];
+                messageClass = "gameMessage";
             }
+            var gameID = chatMessage.gameID;
             $("#messages").append("<li>" +
-                ("<span class='float-" + floatDirection + "'>") +
-                '<span class="circle">' +
+                "<span class='float-left'>" +
+                ("<span class=\"circle" + ([0, 1, 2].includes(gameID) ? " circle" + gameID : "") + "\">") +
                 chatMessage.from +
                 '</span>' +
                 '</span>' +
-                ("<div class=\"" + messageClass + "\">") +
+                ("<div class=\"" + messageClass + ([0, 1, 2].includes(gameID) ? " " + messageClass + gameID : "") + "\">") +
                 chatMessage.message +
                 '</div>' +
                 '</li>');
@@ -109,7 +109,6 @@ var Client = /** @class */ (function () {
                     }
                     if (_this.inThisRound[gid] && !_this.alertedWinnersLoosers[gid] && gameState.winnersCalculated) {
                         _this.inThisRound[gid] = false;
-                        console.log("Entered here... Yahahahah");
                         if (gameState.winners.includes(_this.socket.id)) {
                             $("#winnerAlert" + gid).fadeIn(100);
                         }
@@ -163,15 +162,15 @@ var Client = /** @class */ (function () {
         if (messageText.toString().length > 0) {
             this.socket.emit("chatMessage", { message: messageText, from: this.player.screenName.abbreviation });
             $("#messages").append('<li>' +
-                '<span class="float-left">' +
-                '<span class="circle">' +
-                this.player.screenName.abbreviation +
-                '</span>' +
-                '</span>' +
+                // '<span class="float-left">' +
+                //   '<span class="circle">' +
+                //     this.player.screenName.abbreviation +
+                //   '</span>' +
+                // '</span>' +
                 '<div class="myMessage">' +
                 messageText +
                 '</div>' +
-                '</li>');
+                '</li><br />');
             this.scrollChatWindow();
             $("#messageText").val("");
         }

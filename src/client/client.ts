@@ -1,7 +1,8 @@
 type ChatMessage = {
   message: string,
   from: string,
-  type: "playerMessage" | "gameMessage"
+  type: "playerMessage" | "gameMessage",
+  gameID?: number
 }
 
 type ScreenName = {
@@ -50,20 +51,22 @@ class Client {
     this.socket.on(
       "chatMessage",
       (chatMessage: ChatMessage) => {
-        let [floatDirection, messageClass] = ["right", "otherMessage"];
+        let messageClass = "otherMessage";
 
         if (chatMessage.type == "gameMessage") {
-          [floatDirection, messageClass] = ["left", "gameMessage"]
+          messageClass = "gameMessage";
         }
+
+        const gameID = chatMessage.gameID;
 
         $("#messages").append(
           "<li>" +
-            `<span class='float-${floatDirection}'>` +
-              '<span class="circle">' +
+            "<span class='float-left'>" +
+              `<span class="circle${[0, 1, 2].includes(gameID) ? " circle" + gameID: ""}">` +
                   chatMessage.from +
               '</span>' +
             '</span>' +
-            `<div class="${messageClass}">` +
+            `<div class="${messageClass}${[0, 1, 2].includes(gameID) ? " " + messageClass + gameID: ""}">` +
               chatMessage.message +
             '</div>' +
           '</li>'
@@ -129,7 +132,6 @@ class Client {
 
           if (this.inThisRound[gid] && !this.alertedWinnersLoosers[gid] && gameState.winnersCalculated) {
             this.inThisRound[gid] = false;
-            console.log("Entered here... Yahahahah");
             if (gameState.winners.includes(this.socket.id)) {
               $("#winnerAlert" + gid).fadeIn(100);
             } else {
@@ -226,15 +228,15 @@ class Client {
       );
       $("#messages").append(
         '<li>' + 
-          '<span class="float-left">' +
-            '<span class="circle">' +
-              this.player.screenName.abbreviation +
-            '</span>' +
-          '</span>' +
+          // '<span class="float-left">' +
+          //   '<span class="circle">' +
+          //     this.player.screenName.abbreviation +
+          //   '</span>' +
+          // '</span>' +
           '<div class="myMessage">' +
             messageText +
           '</div>' +
-        '</li>'
+        '</li><br />'
       );
       this.scrollChatWindow();
       $("#messageText").val("");

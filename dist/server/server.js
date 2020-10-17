@@ -32,7 +32,9 @@ class App {
                 console.log("User disconnected", socket.id);
                 // Delete the player detail with current socket ID if present
                 if (this.players && this.players[socket.id]) {
+                    const screenName = this.players[socket.id].screenName.name;
                     delete this.players[socket.id];
+                    socket.broadcast.emit("chatMessage", { message: `Bye bye <strong>${screenName}</strong>`, from: "🤖", type: "gameMessage" });
                 }
             });
             // Send the chat message to everyone else connected.
@@ -43,6 +45,7 @@ class App {
                 this.players[socket.id] = new player_1.default(screenName);
                 // Send the new player details to the client.
                 socket.emit("playerDetails", this.players[socket.id].player);
+                socket.broadcast.emit("chatMessage", { message: `Welcome <strong>${screenName.name}</strong>`, from: "🤖", type: "gameMessage" });
             });
             socket.on("submitGuess", (gameId, guess) => {
                 if (guess >= 0 && guess <= 10) {

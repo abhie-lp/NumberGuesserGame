@@ -1,4 +1,3 @@
-import { timeStamp } from "console";
 import express from "express";
 import http from "http";
 import path from "path";
@@ -48,7 +47,12 @@ class App {
 
         // Delete the player detail with current socket ID if present
         if (this.players && this.players[socket.id]) {
+          const screenName = this.players[socket.id].screenName.name;
           delete this.players[socket.id];
+          socket.broadcast.emit(
+            "chatMessage",
+            <ChatMessage>{message: `Bye bye <strong>${screenName}</strong>`, from: "🤖", type: "gameMessage"}
+          );
         }
       });
 
@@ -66,6 +70,10 @@ class App {
 
         // Send the new player details to the client.
         socket.emit("playerDetails", this.players[socket.id].player);
+        socket.broadcast.emit(
+          "chatMessage",
+          <ChatMessage>{message: `Welcome <strong>${screenName.name}</strong>`, from: "🤖", type: "gameMessage"}
+        );
       });
 
       socket.on("submitGuess", (gameId: number, guess: number) => {

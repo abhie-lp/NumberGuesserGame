@@ -17,7 +17,8 @@ class GuessNumberGame {
                 let chatMessage = {
                     message: this._players[playerSocketId].screenName.name + " is playing",
                     from: this._logo,
-                    type: "gameMessage"
+                    type: "gameMessage",
+                    gameID: this._id
                 };
                 this._updateChatCallback(chatMessage);
             }
@@ -41,14 +42,16 @@ class GuessNumberGame {
                 this._winnersCalculated = false;
                 this._updateChatCallback({ message: "New Game",
                     from: this._logo,
-                    type: "gameMessage" });
+                    type: "gameMessage",
+                    gameID: this._id });
             }
             else if (this._gamePhase === 1) {
                 if (this._gameClock < 0) {
                     this._gamePhase = 2;
                     this._updateChatCallback({ message: "Game Closed",
                         from: this._logo,
-                        type: "gameMessage" });
+                        type: "gameMessage",
+                        gameID: this._id });
                 }
             }
             else if (this._gamePhase === 2) {
@@ -56,7 +59,8 @@ class GuessNumberGame {
                     this._result = (Math.floor(Math.random() * 10) + 1);
                     this._updateChatCallback({ message: "Result: " + this._result,
                         from: this._logo,
-                        type: "gameMessage" });
+                        type: "gameMessage",
+                        gameID: this._id });
                 }
                 else if (this._gameClock === -3) {
                     // get winners
