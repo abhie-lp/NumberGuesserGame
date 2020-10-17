@@ -22,9 +22,9 @@ class App {
         app.use("/bootstrap", express_1.default.static(path_1.default.join(__dirname, "../../node_modules/bootstrap/dist")));
         this.server = new http_1.default.Server(app);
         this.io = socket_io_1.default(this.server);
-        this.games[0] = new gameEngine_1.default(0, "Bronze Game", "🥉", 10, this.updateChat);
-        this.games[1] = new gameEngine_1.default(1, "Silver Game", "🥈", 16, this.updateChat);
-        this.games[2] = new gameEngine_1.default(2, "Gold Game", "🥇", 35, this.updateChat);
+        this.games[0] = new gameEngine_1.default(0, "Bronze Game", "🥉", 10, 1, this.players, this.updateChat);
+        this.games[1] = new gameEngine_1.default(1, "Silver Game", "🥈", 16, 2, this.players, this.updateChat);
+        this.games[2] = new gameEngine_1.default(2, "Gold Game", "🥇", 35, 3, this.players, this.updateChat);
         this.io.on("connection", (socket) => {
             console.log("User Connected: ", socket.id);
             socket.on("disconnect", () => {
@@ -42,6 +42,13 @@ class App {
                 this.players[socket.id] = new player_1.default(screenName);
                 // Send the new player details to the client.
                 socket.emit("playerDetails", this.players[socket.id].player);
+            });
+            socket.on("submitGuess", (gameId, guess) => {
+                if (guess >= 0 && guess <= 10) {
+                    if (this.games[gameId].submitGuess(socket.id, guess)) {
+                        socket.emit("confirmGuess", gameId, guess, this.players[socket.id].player.score);
+                    }
+                }
             });
         });
         setInterval(() => {

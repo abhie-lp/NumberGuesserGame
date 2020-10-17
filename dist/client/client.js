@@ -1,6 +1,9 @@
 var Client = /** @class */ (function () {
     function Client() {
         var _this = this;
+        // To track whether the player has made guesses in any game i.e 0 or 1 or 2
+        this.inThisRound = [false, false, false];
+        this.submitGuess = function (gameId, guess) { return _this.socket.emit("submitGuess", gameId, guess); };
         this.setScreenName = function () {
             var enteredName = $("#screenNameInput").val();
             console.log("Screen Name", enteredName);
@@ -62,9 +65,13 @@ var Client = /** @class */ (function () {
         this.socket.on("GameStates", function (gameStates) {
             gameStates.forEach(function (gameState) {
                 var gid = gameState.id;
-                if (gameState.gameClock >= 0) {
+                if (gameState.gameClock >= 0) { // New game begins.
                     if (gameState.gameClock >= gameState.duration) {
                         $("#gamephase" + gid).text("New game. Time to check your luck.");
+                        for (var x = 0; x < 10; x++) {
+                            // Enable all buttons to be clicked on a new game.
+                            $("#submitButton" + gid + x).prop("disabled", false);
+                        }
                     }
                     if (gameState.gameClock === gameState.duration - 5) {
                         $("#resultAlert" + gid).alert().fadeOut(500);
@@ -80,12 +87,29 @@ var Client = /** @class */ (function () {
                     $("#timerBar" + gid).css("width", "100%");
                     $("#timer" + gid).css("display", "none");
                     $("#gamePhase" + gid).text("Game Closed.");
+                    // Disable the buttons while new game is started.
+                    for (var x = 0; x < 10; x++) {
+                        $("#submitButton" + gid + x).prop("disabled", true);
+                    }
+                    $("#goodLuckMessage" + gid).css("display", "none");
                     if (gameState.gameClock === -2 && gameState.result !== -1) {
                         $("#resultValue" + gid).text(gameState.result);
                         $("#resultAlert" + gid).fadeIn(100);
+                        //  Animate the button clicked and then remove the animation
+                        $("#submitButton" + gid + (gameState.result - 1)).css("animation", "glowing 1000ms infinite");
+                        setTimeout(function () {
+                            $("#submitButton" + gid + (gameState.result - 1)).css("animation", "");
+                        }, 4000);
                     }
                 }
             });
+        });
+        // Handle the response from server
+        this.socket.on("confirmGuess", function (gameId, guess, score) {
+            _this.inThisRound[gameId] = true;
+            $("#submitButton" + gameId + (guess - 1)).prop("disabled", true);
+            $("#goodLuckMessage" + gameId).css("display", "inline-block");
+            $(".score").text(score);
         });
         $(document).ready(function () {
             $("#resultValue0").addClass("spinnner");

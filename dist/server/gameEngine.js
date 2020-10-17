@@ -1,19 +1,40 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class GuessNumberGame {
-    constructor(id, title, logo, duration, updateChatCallback) {
+    constructor(id, title, logo, duration, enterPoints, players, updateChatCallback) {
         this._gamePhase = 0;
         this._gameClock = 0;
         this._result = -1;
+        this._players = {};
+        this._guesses = {};
+        this.submitGuess = (playerSocketId, guess) => {
+            if (!this._guesses[playerSocketId]) {
+                this._guesses[playerSocketId] = [];
+            }
+            this._players[playerSocketId].adjustScore(this._enterPoints * -1);
+            this._guesses[playerSocketId].push(guess);
+            if (this._guesses[playerSocketId].length == 1) {
+                let chatMessage = {
+                    message: this._players[playerSocketId].screenName.name + " is playing",
+                    from: this._logo,
+                    type: "gameMessage"
+                };
+                this._updateChatCallback(chatMessage);
+            }
+            return true;
+        };
         this._id = id;
         this._title = title;
         this._logo = logo;
         this._duration = duration;
+        this._enterPoints = enterPoints;
+        this._players = players;
         this._updateChatCallback = updateChatCallback;
         setInterval(() => {
             if (this._gamePhase === 0) {
                 this._gameClock = this._duration;
                 this._gamePhase = 1;
+                this._guesses = {};
                 this._updateChatCallback({ message: "New Game",
                     from: this._logo,
                     type: "gameMessage" });

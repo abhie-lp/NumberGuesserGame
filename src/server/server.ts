@@ -30,9 +30,15 @@ class App {
 
     this.server = new http.Server(app);
     this.io = socketIO(this.server);
-    this.games[0] = new GuessNumberGame(0, "Bronze Game", "🥉", 10, this.updateChat);
-    this.games[1] = new GuessNumberGame(1, "Silver Game", "🥈", 16, this.updateChat);
-    this.games[2] = new GuessNumberGame(2, "Gold Game", "🥇", 35, this.updateChat);
+    this.games[0] = new GuessNumberGame(
+      0, "Bronze Game", "🥉", 10, 1, this.players, this.updateChat
+    );
+    this.games[1] = new GuessNumberGame(
+      1, "Silver Game", "🥈", 16, 2, this.players, this.updateChat
+    );
+    this.games[2] = new GuessNumberGame(
+      2, "Gold Game", "🥇", 35, 3, this.players, this.updateChat
+    );
 
     this.io.on("connection", (socket: socketIO.Socket) => {
       console.log("User Connected: ", socket.id);
@@ -60,6 +66,14 @@ class App {
 
         // Send the new player details to the client.
         socket.emit("playerDetails", this.players[socket.id].player);
+      });
+
+      socket.on("submitGuess", (gameId: number, guess: number) => {
+        if (guess >= 0 && guess <= 10) {
+          if (this.games[gameId].submitGuess(socket.id, guess)) {
+            socket.emit("confirmGuess", gameId, guess, this.players[socket.id].player.score)
+          }
+        }
       })
     });
 
