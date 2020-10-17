@@ -31,13 +31,13 @@ class App {
     this.server = new http.Server(app);
     this.io = socketIO(this.server);
     this.games[0] = new GuessNumberGame(
-      0, "Bronze Game", "🥉", 10, 1, this.players, this.updateChat
+      0, "Bronze Game", "🥉", 10, 1, 10, this.players, this.updateChat, this.sendPlayerDetails
     );
     this.games[1] = new GuessNumberGame(
-      1, "Silver Game", "🥈", 16, 2, this.players, this.updateChat
+      1, "Silver Game", "🥈", 16, 3, 20, this.players, this.updateChat, this.sendPlayerDetails
     );
     this.games[2] = new GuessNumberGame(
-      2, "Gold Game", "🥇", 35, 3, this.players, this.updateChat
+      2, "Gold Game", "🥇", 35, 5, 50, this.players, this.updateChat, this.sendPlayerDetails
     );
 
     this.io.on("connection", (socket: socketIO.Socket) => {
@@ -86,6 +86,8 @@ class App {
   }
 
   updateChat = (chatMessage: ChatMessage) => this.io.emit("chatMessage", chatMessage);
+
+  sendPlayerDetails = (playerSocketID: string) => this.io.to(playerSocketID).emit("playerDetails", this.players[playerSocketID].player)
 
   Start() {
     this.server.listen(this.port);

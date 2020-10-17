@@ -16,15 +16,16 @@ class App {
         this.games = {};
         this.players = {};
         this.updateChat = (chatMessage) => this.io.emit("chatMessage", chatMessage);
+        this.sendPlayerDetails = (playerSocketID) => this.io.to(playerSocketID).emit("playerDetails", this.players[playerSocketID].player);
         const app = express_1.default();
         app.use(express_1.default.static(path_1.default.join(__dirname, "../client")));
         app.use("/jquery", express_1.default.static(path_1.default.join(__dirname, "../../node_modules/jquery/dist")));
         app.use("/bootstrap", express_1.default.static(path_1.default.join(__dirname, "../../node_modules/bootstrap/dist")));
         this.server = new http_1.default.Server(app);
         this.io = socket_io_1.default(this.server);
-        this.games[0] = new gameEngine_1.default(0, "Bronze Game", "🥉", 10, 1, this.players, this.updateChat);
-        this.games[1] = new gameEngine_1.default(1, "Silver Game", "🥈", 16, 2, this.players, this.updateChat);
-        this.games[2] = new gameEngine_1.default(2, "Gold Game", "🥇", 35, 3, this.players, this.updateChat);
+        this.games[0] = new gameEngine_1.default(0, "Bronze Game", "🥉", 10, 1, 10, this.players, this.updateChat, this.sendPlayerDetails);
+        this.games[1] = new gameEngine_1.default(1, "Silver Game", "🥈", 16, 3, 20, this.players, this.updateChat, this.sendPlayerDetails);
+        this.games[2] = new gameEngine_1.default(2, "Gold Game", "🥇", 35, 5, 50, this.players, this.updateChat, this.sendPlayerDetails);
         this.io.on("connection", (socket) => {
             console.log("User Connected: ", socket.id);
             socket.on("disconnect", () => {

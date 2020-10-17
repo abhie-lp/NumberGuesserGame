@@ -22,6 +22,8 @@ type GameState = {
   gameClock: number,
   duration: number,
   result: number
+  winners: string[];
+  winnersCalculated: boolean;
 }
 
 
@@ -30,6 +32,9 @@ class Client {
   private player: Player;
   // To track whether the player has made guesses in any game i.e 0 or 1 or 2
   private inThisRound: boolean[] = [false, false, false];
+
+  // Property to check whether we have shown the alert so that we don't keep showing it.
+  private alertedWinnersLoosers: boolean[] = [false, false, false];
 
   constructor() {
     this.socket = io();
@@ -79,14 +84,18 @@ class Client {
         if (gameState.gameClock >= 0) { // New game begins.
           if (gameState.gameClock >= gameState.duration) {
             $("#gamephase" + gid).text("New game. Time to check your luck.");
+            this.alertedWinnersLoosers[gid] = false;
             for (let x = 0; x < 10; x++) {
               // Enable all buttons to be clicked on a new game.
               $("#submitButton" + gid + x).prop("disabled", false);
             }
           }
-
+          
+          // After 5 seconds into the new round
           if (gameState.gameClock === gameState.duration - 5) {
             (<any>$("#resultAlert" + gid)).alert().fadeOut(500);
+            (<any>$("#winnerAlert" + gid)).alert().fadeOut(500);
+            (<any>$("#looserAlert" + gid)).alert().fadeOut(500);
           }
 
           $("#timer" + gid).css("display", "block");
@@ -117,6 +126,19 @@ class Client {
               $("#submitButton" + gid + (gameState.result - 1)).css("animation", "");
             }, 4000)
           }
+
+          if (this.inThisRound[gid] && !this.alertedWinnersLoosers[gid] && gameState.winnersCalculated) {
+            this.inThisRound[gid] = false;
+            console.log("Entered here... Yahahahah");
+            if (gameState.winners.includes(this.socket.id)) {
+              $("#winnerAlert" + gid).fadeIn(100);
+            } else {
+              $("#looserAlert" + gid).fadeIn(100);
+            }
+
+            // Set the game alert to true for current game ID
+            this.alertedWinnersLoosers[gid] = true;
+          }
         }
       })
     });
@@ -137,6 +159,12 @@ class Client {
       (<any>$("#resultAlert0")).alert().hide();
       (<any>$("#resultAlert1")).alert().hide();
       (<any>$("#resultAlert2")).alert().hide();
+      (<any>$("#winnerAlert0")).alert().hide();
+      (<any>$("#winnerAlert1")).alert().hide();
+      (<any>$("#winnerAlert2")).alert().hide();
+      (<any>$("#looserAlert0")).alert().hide();
+      (<any>$("#looserAlert1")).alert().hide();
+      (<any>$("#looserAlert2")).alert().hide();
 
       $("#messageText").keypress((e) => {
         let key = e.which;

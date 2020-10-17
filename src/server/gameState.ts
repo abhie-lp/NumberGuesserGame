@@ -5,5 +5,7 @@ type GameState = {
   gamePhase: number,
   gameClock: number,
   duration: number,
-  result: number
+  result: number,
+  winners: string[],
+  winnersCalculated: boolean
 }

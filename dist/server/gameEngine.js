@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class GuessNumberGame {
-    constructor(id, title, logo, duration, enterPoints, players, updateChatCallback) {
+    constructor(id, title, logo, duration, enterPoints, winPoints, players, updateChatCallback, sendPlayerDetailsCallback) {
         this._gamePhase = 0;
         this._gameClock = 0;
         this._result = -1;
@@ -29,12 +29,16 @@ class GuessNumberGame {
         this._duration = duration;
         this._enterPoints = enterPoints;
         this._players = players;
+        this._winPoints = winPoints;
         this._updateChatCallback = updateChatCallback;
+        this._sendPlayerDetailsCallback = sendPlayerDetailsCallback;
         setInterval(() => {
             if (this._gamePhase === 0) {
                 this._gameClock = this._duration;
                 this._gamePhase = 1;
                 this._guesses = {};
+                this._winners = [];
+                this._winnersCalculated = false;
                 this._updateChatCallback({ message: "New Game",
                     from: this._logo,
                     type: "gameMessage" });
@@ -54,6 +58,15 @@ class GuessNumberGame {
                         from: this._logo,
                         type: "gameMessage" });
                 }
+                else if (this._gameClock === -3) {
+                    // get winners
+                    this._winners = this.calculateWinners(this._result);
+                    this._winners.forEach(winner => {
+                        this._players[winner].adjustScore(this._winPoints);
+                        this._sendPlayerDetailsCallback(winner);
+                    });
+                    this._winnersCalculated = true;
+                }
                 else if (this._gameClock <= -5) {
                     this._gamePhase = 0;
                 }
@@ -65,12 +78,25 @@ class GuessNumberGame {
                 duration: this._duration,
                 gameClock: this._gameClock,
                 gamePhase: this._gamePhase,
-                result: this._result
+                result: this._result,
+                winners: this._winners,
+                winnersCalculated: this._winnersCalculated
             };
             this._gameClock -= 1;
         }, 1000);
     }
     get gameState() { return this._gameState; }
+    calculateWinners(number) {
+        let ret = [];
+        for (let playerSocketID in this._guesses) {
+            for (let guess in this._guesses[playerSocketID]) {
+                if (number === this._guesses[playerSocketID][guess]) {
+                    ret.push(playerSocketID);
+                }
+            }
+        }
+        return ret;
+    }
 }
 exports.default = GuessNumberGame;
 //# sourceMappingURL=gameEngine.js.map

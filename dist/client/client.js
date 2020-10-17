@@ -3,6 +3,8 @@ var Client = /** @class */ (function () {
         var _this = this;
         // To track whether the player has made guesses in any game i.e 0 or 1 or 2
         this.inThisRound = [false, false, false];
+        // Property to check whether we have shown the alert so that we don't keep showing it.
+        this.alertedWinnersLoosers = [false, false, false];
         this.submitGuess = function (gameId, guess) { return _this.socket.emit("submitGuess", gameId, guess); };
         this.setScreenName = function () {
             var enteredName = $("#screenNameInput").val();
@@ -68,13 +70,17 @@ var Client = /** @class */ (function () {
                 if (gameState.gameClock >= 0) { // New game begins.
                     if (gameState.gameClock >= gameState.duration) {
                         $("#gamephase" + gid).text("New game. Time to check your luck.");
+                        _this.alertedWinnersLoosers[gid] = false;
                         for (var x = 0; x < 10; x++) {
                             // Enable all buttons to be clicked on a new game.
                             $("#submitButton" + gid + x).prop("disabled", false);
                         }
                     }
+                    // After 5 seconds into the new round
                     if (gameState.gameClock === gameState.duration - 5) {
                         $("#resultAlert" + gid).alert().fadeOut(500);
+                        $("#winnerAlert" + gid).alert().fadeOut(500);
+                        $("#looserAlert" + gid).alert().fadeOut(500);
                     }
                     $("#timer" + gid).css("display", "block");
                     $("#timer" + gid).text(gameState.gameClock.toString());
@@ -101,6 +107,18 @@ var Client = /** @class */ (function () {
                             $("#submitButton" + gid + (gameState.result - 1)).css("animation", "");
                         }, 4000);
                     }
+                    if (_this.inThisRound[gid] && !_this.alertedWinnersLoosers[gid] && gameState.winnersCalculated) {
+                        _this.inThisRound[gid] = false;
+                        console.log("Entered here... Yahahahah");
+                        if (gameState.winners.includes(_this.socket.id)) {
+                            $("#winnerAlert" + gid).fadeIn(100);
+                        }
+                        else {
+                            $("#looserAlert" + gid).fadeIn(100);
+                        }
+                        // Set the game alert to true for current game ID
+                        _this.alertedWinnersLoosers[gid] = true;
+                    }
                 }
             });
         });
@@ -118,6 +136,12 @@ var Client = /** @class */ (function () {
             $("#resultAlert0").alert().hide();
             $("#resultAlert1").alert().hide();
             $("#resultAlert2").alert().hide();
+            $("#winnerAlert0").alert().hide();
+            $("#winnerAlert1").alert().hide();
+            $("#winnerAlert2").alert().hide();
+            $("#looserAlert0").alert().hide();
+            $("#looserAlert1").alert().hide();
+            $("#looserAlert2").alert().hide();
             $("#messageText").keypress(function (e) {
                 var key = e.which;
                 if (key == 13) {
