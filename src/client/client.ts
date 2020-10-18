@@ -207,9 +207,11 @@ class Client {
   }
 
   private scrollChatWindow = () => {
-    $("#messages").animate({
-      scrollTop: $("#messages").prop("scrollHeight")
-    }, 200);
+    if (($("#messages").prop("scrollHeight") - <any>$("#messages").scrollTop()) < $("#messages").height() + 50) {
+      $("#messages").animate({
+        scrollTop: $("#messages").prop("scrollHeight")
+      }, 200);
+    }
 
     setTimeout(() => {
       let messagesLength = $("#messages li");

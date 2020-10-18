@@ -23,9 +23,11 @@ var Client = /** @class */ (function () {
             }
         };
         this.scrollChatWindow = function () {
-            $("#messages").animate({
-                scrollTop: $("#messages").prop("scrollHeight")
-            }, 200);
+            if (($("#messages").prop("scrollHeight") - $("#messages").scrollTop()) < $("#messages").height() + 50) {
+                $("#messages").animate({
+                    scrollTop: $("#messages").prop("scrollHeight")
+                }, 200);
+            }
             setTimeout(function () {
                 var messagesLength = $("#messages li");
                 if (messagesLength.length > 50) {
