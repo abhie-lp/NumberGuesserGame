@@ -6,7 +6,7 @@ import socketIO from "socket.io";
 import GuessNumberGame from "./gameEngine";
 import Player from "./player";
 
-const PORT: number = 3000;
+const PORT: number = parseInt(process.env.PORT) || 3000;
 
 
 class App {

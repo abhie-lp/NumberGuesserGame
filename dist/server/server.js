@@ -9,7 +9,7 @@ const path_1 = __importDefault(require("path"));
 const socket_io_1 = __importDefault(require("socket.io"));
 const gameEngine_1 = __importDefault(require("./gameEngine"));
 const player_1 = __importDefault(require("./player"));
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT) || 3000;
 class App {
     constructor(port) {
         this.port = port;
